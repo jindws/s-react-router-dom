@@ -11,7 +11,11 @@ export default function Link(props:Interface){
         history.push(to)
     }
     const {to,children} = props;
-    return <Context.Consumer>
-        {value=><a href={to} onClick={Jump.bind(this,value.history)}>{children}</a>}
-    </Context.Consumer>
+    const {
+        history,
+    } = React.useContext(Context)
+    return <a href={to} onClick={Jump.bind(this,history)}>{children}</a>
+    // return <Context.Consumer>
+    //     {value=><a href={to} onClick={Jump.bind(this,value.history)}>{children}</a>}
+    // </Context.Consumer>
 }
