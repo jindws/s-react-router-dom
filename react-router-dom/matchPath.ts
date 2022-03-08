@@ -1,8 +1,6 @@
-import pathToRegexp from "path-to-regexp";
+// const { pathToRegexp } = require("path-to-regexp");
 
 const cache = {};
-const cacheLimit = 10000;
-let cacheCount = 0;
 
 function compilePath(path, options) {
   const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
@@ -11,21 +9,19 @@ function compilePath(path, options) {
   if (pathCache[path]) return pathCache[path];
 
   const keys = [];
-  const regexp = pathToRegexp(path, keys, options);
-  const result = { regexp, keys };
-
-  if (cacheCount < cacheLimit) {
-    pathCache[path] = result;
-    cacheCount++;
+  // const regexp = pathToRegexp(path, keys, options);
+  if(path==='*'){
+    path='.'
   }
-
+  const result = { regexp: new RegExp(`\^${path}$`), keys };
+  pathCache[path] = result;
   return result;
 }
 
 /**
  * Public API for matching a URL pathname to a path.
  */
-function matchPath(pathname, options = {}) {
+function matchPath(pathname, options: any = {}) {
   if (typeof options === "string" || Array.isArray(options)) {
     options = { path: options };
   }
@@ -41,7 +37,7 @@ function matchPath(pathname, options = {}) {
     const { regexp, keys } = compilePath(path, {
       end: exact,
       strict,
-      sensitive
+      sensitive,
     });
     const match = regexp.exec(pathname);
 
@@ -55,11 +51,11 @@ function matchPath(pathname, options = {}) {
     return {
       path, // the path used to match
       url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
-      isExact, // whether or not we matched exactly
+      isExact, // whether we matched exactly
       params: keys.reduce((memo, key, index) => {
         memo[key.name] = values[index];
         return memo;
-      }, {})
+      }, {}),
     };
   }, null);
 }
